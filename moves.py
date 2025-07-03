@@ -42,11 +42,11 @@ def create_all_moves():
         for target_hand in [LEFT_HAND, RIGHT_HAND]:
             moves.append(Move(move_type, source_hand, target_hand, 0))
 
-    move_type = SWAP
-    for source_hand in [LEFT_HAND, RIGHT_HAND]:
-        for target_hand in [LEFT_HAND, RIGHT_HAND]:
-            if source_hand != target_hand:
-                for amount in [ONE, TWO, THREE, FOUR]:
-                    moves.append(Move(move_type, source_hand, target_hand, amount))
+    # move_type = SWAP
+    # for source_hand in [LEFT_HAND, RIGHT_HAND]:
+    #     for target_hand in [LEFT_HAND, RIGHT_HAND]:
+    #         if source_hand != target_hand:
+    #             for amount in [ONE, TWO, THREE, FOUR]:
+    #                 moves.append(Move(move_type, source_hand, target_hand, amount))
 
     return moves

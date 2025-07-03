@@ -22,6 +22,9 @@ class Cache(object):
 
     def __contains__(self, key):
         return ~np.isnan(self.cache[key])
+    
+    def __len__(self):
+        return len(self.cache) - np.isnan(self.cache).sum()
 
     def reset_cache(self):
         self.cache.fill(np.nan)
@@ -146,15 +149,13 @@ class Game(object):
             if p2_dead and not p1_dead:
                 return 1.0 if self.player_1_turn else -1.0
 
-        return np.nan
+        return 0.0
 
     def __hash__(self):
         # Implement logic to hash the current state for fast lookup
         state = self.state.copy()
-        if state[0] > state[1]:
-            state[0], state[1] = state[1], state[0]
-        if state[2] > state[3]:
-            state[2], state[3] = state[3], state[2]
+        state[:2] = np.sort(state[:2])
+        state[2:] = np.sort(state[2:])
 
         base = 5
         return int(
