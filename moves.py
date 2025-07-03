@@ -17,11 +17,12 @@ FOUR = 4
 FIVE = 5
 
 spec = [
-    ('move_type', int64),  # Type of move (attack or swap)
-    ('source_hand', int64),  # Source hand (left or right)
-    ('target_hand', int64),  # Target hand (left or right)
-    ('amount', int64)  # Amount of cards to move
+    ("move_type", int64),  # Type of move (attack or swap)
+    ("source_hand", int64),  # Source hand (left or right)
+    ("target_hand", int64),  # Target hand (left or right)
+    ("amount", int64),  # Amount of cards to move
 ]
+
 
 @jitclass(spec)
 class Move(object):
@@ -30,6 +31,7 @@ class Move(object):
         self.source_hand = source_hand
         self.target_hand = target_hand
         self.amount = amount
+
 
 @njit
 def create_all_moves():
@@ -48,5 +50,3 @@ def create_all_moves():
                     moves.append(Move(move_type, source_hand, target_hand, amount))
 
     return moves
-
-

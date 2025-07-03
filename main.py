@@ -1,20 +1,24 @@
-from numba import njit
-from game import Game, Cache, get_initial_cache
-from moves import create_all_moves
 import time
-import numpy as np
 from itertools import product
+
+import numpy as np
+from numba import njit
 from tqdm import tqdm
+
+from game import Cache, Game, get_initial_cache
+from moves import create_all_moves
 
 
 # @njit
-def alpha_beta_search(state: Game, depth: int, alpha: float, beta: float, endgame_db: Cache):
+def alpha_beta_search(
+    state: Game, depth: int, alpha: float, beta: float, endgame_db: Cache
+):
     state_hash = hash(state)
     if depth == 0 or state.is_terminal() or state_hash in endgame_db:
         if state_hash in endgame_db:
             return endgame_db[state_hash], 1
         return state.get_state_value(), 1
-    
+
     level_cache = get_initial_cache()
 
     state_value = np.nan
@@ -35,12 +39,12 @@ def alpha_beta_search(state: Game, depth: int, alpha: float, beta: float, endgam
             break
 
         alpha = max(alpha, state_value)
-    
+
     return state_value, total_count
 
 
 def generate_endgame_db():
-    endgame_db = get_initial_cache()    
+    endgame_db = get_initial_cache()
     states = list(product(range(5), repeat=4))
     for i1, i2, i3, i4 in tqdm(states):
         if (i1, i2) == (0, 0) or (i3, i4) == (0, 0):
@@ -56,7 +60,7 @@ def generate_endgame_db():
                 endgame_db[state_hash] = result[0]
             else:
                 print(f"Invalid state: {initial_state}, p1_turn: {p1_turn}")
-    
+
     return endgame_db
 
 
