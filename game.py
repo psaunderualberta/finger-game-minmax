@@ -29,6 +29,9 @@ class Cache(object):
     def reset_cache(self):
         self.cache.fill(np.nan)
 
+    def copy(self):
+        return Cache(self.cache.copy())
+
 
 spec = [
     ("state", int64[:]),  # 2D array for the game state
