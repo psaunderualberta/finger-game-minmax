@@ -123,26 +123,30 @@ class Game(object):
 
         hs = hash(self)
         new_seen_states = self.seen_states.copy()
-        new_seen_states[hs] = 0.0
-        return Game(new_state, not self.player_1_turn, new_seen_states)
+        cache = Cache(new_seen_states)
+        cache[hs] = 0.0
+        assert hs in cache
+        return Game(new_state, not self.player_1_turn, cache.cache)
 
     def is_terminal(self):
         hs = hash(self)
+        cache = Cache(self.seen_states)
         return (
             self.state[:2].sum() == 0
             or self.state[2:].sum() == 0
-            or hs in self.seen_states
+            or hs in cache
         )
 
     def get_state_value(self):
         # Implement logic to calculate the value of the state for the given player
+        cache = Cache(self.seen_states)
         if self.is_terminal():
             hs = hash(self)
             p1_dead = self.state[:2].sum() == 0
             p2_dead = self.state[2:].sum() == 0
 
-            if hs in self.seen_states:
-                return self.seen_states[hs]
+            if hs in cache:
+                return cache[hs]
 
             if p1_dead and not p2_dead:
                 return -1.0 if self.player_1_turn else 1.0
@@ -177,3 +181,10 @@ def get_initial_cache():
     return Cache(
         np.zeros(4 * 5**4 + 4 * 5**3 + 4 * 5**2 + 4 * 5 + 2, dtype=np.float64) + np.nan
     )
+
+
+if __name__ == "__main__":
+    init = Game.get_initial_state()
+    print(init)
+    g = Game(init[0], init[1], init[2])
+    

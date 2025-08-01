@@ -6,9 +6,9 @@ from numba import njit
 from tqdm import tqdm
 
 from game import Cache, Game, get_initial_cache
-from moves import create_all_moves
 
 
+# TODO: Add optimal move tracking
 @njit
 def alpha_beta_search(
     state: Game, depth: int, alpha: float, beta: float, endgame_db: Cache
@@ -37,16 +37,18 @@ def alpha_beta_search(
         total_count += cnt
         state_value = max(-value, state_value)
 
-
         if state_value >= beta:
             break
 
         alpha = max(alpha, state_value)
 
+    if state_value != 0:
+        game_solved = True  # this player can guarantee a win or cannot avoid a loss
+
     return state_value, total_count, game_solved
 
 
-def generate_endgame_db(depth=15, existing_db=get_initial_cache()):
+def generate_endgame_db(depth=1, existing_db=get_initial_cache()):
     endgame_db = get_initial_cache()
     analyzed_states = get_initial_cache()
     states = list(product(range(5), repeat=4))
@@ -74,7 +76,7 @@ def generate_endgame_db(depth=15, existing_db=get_initial_cache()):
     return endgame_db
 
 
-def repeated_endgame_search(depth=10):
+def repeated_endgame_search(depth=3):
     endgame_db = get_initial_cache()
     assert len(endgame_db) == 0, "Endgame database should be empty before generation."
     new_endgame_db = generate_endgame_db(depth)
@@ -84,19 +86,21 @@ def repeated_endgame_search(depth=10):
         new_endgame_db = generate_endgame_db(depth, existing_db=endgame_db)
     
     print(f"Final endgame database size: {len(endgame_db)}")
+    return endgame_db
 
 
 def main():
-    endgame_db = repeated_endgame_search()
+    endgame_db = repeated_endgame_search(depth=1)
     initial_state, player_1_turn, seen_states = Game.get_initial_state()
 
-    initial_state = np.array([1, 1, 3, 3], dtype=np.int64)  # Example initial state
+    # initial_state = np.array([1, 1, 3, 3], dtype=np.int64)  # Example initial state
+    initial_state = np.array([1, 1, 1, 1], dtype=np.int64)  # Example initial state
 
     game = Game(initial_state, player_1_turn, seen_states)
 
     # Start the alpha-beta search
     print("Starting alpha-beta search...")
-    for depth in range(1, 40):
+    for depth in range(1, 50):
         start = time.time()
         best_value = alpha_beta_search(game, depth, -1, 1, endgame_db)
         end = time.time()
